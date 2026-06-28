@@ -9,9 +9,9 @@ module.exports = {
   commandOrder: ['help', 'ip', 'status', 'player', 'ping', 'about', 'uptime', 'changelog', 'groupid'],
   enableMonitoring: true,
   monitorInterval: 60000,
-  notificationGroupId: '35455038935243@g.us',
+  notificationGroupId: '120363408440292260@g.us',
   allowedCommandGroups: [
-    '35455038935243@g.us'
+    '120363408440292260@g.us'
   ],
   ownerNumbers: [
     '6281335758501@c.us'
