@@ -1,4 +1,4 @@
-const { statusBedrock } = require('minecraft-server-util');
+const { getBedrockStatus } = require('../utils/minecraftStatus');
 const { isServerConfigReady } = require('../utils/serverConfig');
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
     }
 
     try {
-      const status = await statusBedrock(config.server.ip, config.server.port);
+      const status = await getBedrockStatus(config, '/status');
 
       await message.reply(
         `Status ${config.server.name}: Online\n` +

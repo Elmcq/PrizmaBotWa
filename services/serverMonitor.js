@@ -1,4 +1,4 @@
-const { statusBedrock } = require('minecraft-server-util');
+const { getBedrockStatus } = require('../utils/minecraftStatus');
 const { isServerConfigReady } = require('../utils/serverConfig');
 const { formatClock } = require('../utils/time');
 
@@ -72,7 +72,7 @@ class ServerMonitor {
 
   async getServerStatus() {
     try {
-      const data = await statusBedrock(this.config.server.ip, this.config.server.port);
+      const data = await getBedrockStatus(this.config, 'monitoring');
 
       return {
         status: STATUS.ONLINE,
