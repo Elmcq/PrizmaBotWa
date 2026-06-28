@@ -73,6 +73,10 @@ client.on('message', async (message) => {
     return;
   }
 
+  console.log(`[${formatClock()}] Command access debug: message.from=${message.from}`);
+  console.log(`[${formatClock()}] Command access debug: message.author=${message.author || '-'}`);
+  console.log(`[${formatClock()}] Command access debug: allowedCommandGroups=${JSON.stringify(config.allowedCommandGroups || [])}`);
+
   if (!isCommandGroupAllowed(message, config)) {
     await message.reply(COMMAND_GROUP_REJECTION_MESSAGE);
     return;
