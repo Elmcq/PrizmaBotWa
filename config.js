@@ -14,8 +14,9 @@ module.exports = {
     '120363408440292260@g.us'
   ],
   ownerNumbers: [
-    '6281335758501@c.us'
-  ],
+  '6281335758501@c.us',
+  '35455038935243@lid'
+],
   server: {
     name: 'Ideology Prizmarine',
     ip: '147.185.221.26',
