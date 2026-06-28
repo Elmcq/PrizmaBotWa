@@ -6,6 +6,7 @@ const config = require('./config');
 const { ServerMonitor } = require('./services/serverMonitor');
 const { formatClock } = require('./utils/time');
 
+const startedAt = new Date();
 const commands = new Map();
 const commandsPath = path.join(__dirname, 'commands');
 
@@ -21,7 +22,7 @@ for (const file of fs.readdirSync(commandsPath).filter((name) => name.endsWith('
 }
 const commandPrefixes = new Set([
   config.prefix,
-  ...[...commands.values()].map((command) => command.prefix).filter(Boolean)
+  ...[...commands.values()].flatMap((command) => getCommandPrefixes(command, config))
 ]);
 
 const client = new Client({
@@ -75,14 +76,14 @@ client.on('message', async (message) => {
   const commandName = rawCommand.toLowerCase();
   const command = commands.get(commandName);
 
-  if (!command || getCommandPrefix(command, config) !== prefix) {
+  if (!command || !getCommandPrefixes(command, config).includes(prefix)) {
     await message.reply('Command tidak ditemukan. Ketik /help');
     return;
   }
 
   try {
     logCommand(prefix, commandName, message.author || message.from);
-    await command.execute(message, { config, commands, receivedAt });
+    await command.execute(message, { config, commands, receivedAt, startedAt });
   } catch (error) {
     console.error(`Gagal menjalankan command /${commandName}:`, error);
     await message.reply('Maaf, command lagi bermasalah. Coba lagi nanti ya.');
@@ -97,8 +98,12 @@ function getMatchedPrefix(text) {
     .find((prefix) => text.startsWith(prefix));
 }
 
-function getCommandPrefix(command, appConfig) {
-  return command.prefix || appConfig.prefix;
+function getCommandPrefixes(command, appConfig) {
+  if (Array.isArray(command.prefixes) && command.prefixes.length > 0) {
+    return command.prefixes;
+  }
+
+  return [command.prefix || appConfig.prefix];
 }
 
 function logCommand(prefix, commandName, sender) {

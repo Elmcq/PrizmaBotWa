@@ -1,4 +1,6 @@
-# Ideology Prizmarine Bot
+# PrizmaBotWa
+
+Version: v1.5.0
 
 WhatsApp bot untuk komunitas Ideology Prizmarine. Bot ini memakai `whatsapp-web.js`, menampilkan QR login di terminal, dan menyimpan session dengan `LocalAuth`.
 
@@ -75,15 +77,18 @@ Setelah berhasil login, session akan tersimpan di folder `.wwebjs_auth`, jadi bi
 
 ## Command
 
-Prefix command adalah `/`.
+Prefix utama command adalah `/`. Beberapa command utilitas/admin memakai prefix `!`.
 
 ```text
-/help   - Tampilkan semua command
-/ip     - Tampilkan IP server Minecraft
-/status - Cek status server
-/player - Tampilkan jumlah player online
-/ping   - Cek bot masih hidup
-/about  - Tampilkan informasi bot
+/help, !help    - Tampilkan semua command
+/ip             - Tampilkan IP server Minecraft
+/status         - Cek status server
+/player         - Tampilkan jumlah player online
+/ping           - Cek bot masih hidup
+/about, !about  - Tampilkan informasi bot
+!uptime         - Tampilkan uptime bot
+!changelog      - Tampilkan changelog terbaru
+!groupid        - Tampilkan informasi grup
 ```
 
 Kalau command tidak dikenal, bot akan membalas:
@@ -93,6 +98,13 @@ Command tidak ditemukan. Ketik /help
 ```
 
 ## Changelog
+
+### v1.5.0
+
+- Added uptime command.
+- Added about command.
+- Added changelog command.
+- Added groupid command.
 
 ### v1.4.0
 

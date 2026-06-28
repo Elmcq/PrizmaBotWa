@@ -24,6 +24,15 @@ function formatUptime(totalSeconds) {
   return parts.join(' ');
 }
 
+function formatCompactUptime(totalSeconds) {
+  const seconds = Math.floor(totalSeconds);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${hours}h ${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`;
+}
+
 function formatClock(date = new Date()) {
   return [
     date.getHours(),
@@ -32,7 +41,23 @@ function formatClock(date = new Date()) {
   ].map((value) => String(value).padStart(2, '0')).join(':');
 }
 
+function formatWibDateTime(date = new Date()) {
+  const formatter = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Jakarta'
+  });
+
+  return `${formatter.format(date).replace(',', '')} WIB`;
+}
+
 module.exports = {
   formatUptime,
-  formatClock
+  formatCompactUptime,
+  formatClock,
+  formatWibDateTime
 };
