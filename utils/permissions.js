@@ -4,7 +4,18 @@ async function getGroupChat(message) {
   return chat.isGroup ? chat : null;
 }
 
-function isGroupAdmin(message, chat) {
+function isOwnerNumber(message, config = {}) {
+  const senderId = message.author || message.from;
+  const ownerNumbers = Array.isArray(config.ownerNumbers) ? config.ownerNumbers : [];
+
+  return ownerNumbers.includes(senderId);
+}
+
+function isGroupAdmin(message, chat, config = {}) {
+  if (isOwnerNumber(message, config)) {
+    return true;
+  }
+
   const senderId = message.author || message.from;
   const participant = chat.participants.find((member) => {
     return member.id && member.id._serialized === senderId;
@@ -15,5 +26,6 @@ function isGroupAdmin(message, chat) {
 
 module.exports = {
   getGroupChat,
-  isGroupAdmin
+  isGroupAdmin,
+  isOwnerNumber
 };

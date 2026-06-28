@@ -4,6 +4,7 @@ const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const config = require('./config');
 const { ServerMonitor } = require('./services/serverMonitor');
+const { COMMAND_GROUP_REJECTION_MESSAGE, isCommandGroupAllowed } = require('./utils/commandAccess');
 const { formatClock } = require('./utils/time');
 
 const startedAt = new Date();
@@ -69,6 +70,11 @@ client.on('message', async (message) => {
   const prefix = getMatchedPrefix(text);
 
   if (!prefix) {
+    return;
+  }
+
+  if (!isCommandGroupAllowed(message, config)) {
+    await message.reply(COMMAND_GROUP_REJECTION_MESSAGE);
     return;
   }
 

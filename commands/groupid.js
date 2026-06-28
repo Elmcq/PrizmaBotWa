@@ -4,7 +4,7 @@ module.exports = {
   name: 'groupid',
   prefix: '!',
   description: 'Tampilkan informasi grup.',
-  async execute(message) {
+  async execute(message, { config } = {}) {
     const chat = await getGroupChat(message);
 
     if (!chat) {
@@ -12,7 +12,7 @@ module.exports = {
       return;
     }
 
-    if (!isGroupAdmin(message, chat)) {
+    if (!isGroupAdmin(message, chat, config)) {
       await message.reply('You do not have permission to use this command.');
       return;
     }
