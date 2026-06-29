@@ -43,7 +43,7 @@ Scan the QR code from WhatsApp linked devices on first login.
 ## JID Formats
 
 - Personal Baileys JID: `628xxxxxxxxxx@s.whatsapp.net`
-- Linked identity JID: `35455038935243@lid`
+- Linked identity JID: `xxxxxxxxxxxx@lid`
 - Group JID: `120363xxxx@g.us`
 
 Legacy `@c.us` JIDs are not used by this Baileys bot.
@@ -55,16 +55,16 @@ BOT_NAME=Ideology Prizmarine Bot
 DISPLAY_NAME=PrizmaBotWa
 PREFIX=/
 WA_AUTH_DIR=./auth
-OWNER_JIDS=6281335758501@s.whatsapp.net,35455038935243@lid
-ALLOWED_GROUP_JIDS=120363402388386113@g.us
-TRIGGER_MENTION_JIDS=6281335758501@s.whatsapp.net,6287730616481@s.whatsapp.net,35455038935243@lid
+OWNER_JIDS=628xxxxxxxxxx@s.whatsapp.net,xxxxxxxxxxxx@lid
+ALLOWED_GROUP_JIDS=120363xxxxxxxxxxxxx@g.us
+TRIGGER_MENTION_JIDS=628xxxxxxxxxx@s.whatsapp.net,xxxxxxxxxxxx@lid
 AUTO_RESTART_COOLDOWN_SECONDS=600
-RAILWAY_PROJECT=140979a3-d79f-4896-89c9-f90bdfe9333e
-RAILWAY_ENVIRONMENT=bb5ac455-bd08-413b-b8c2-51387174ecee
-RAILWAY_SERVICE=995190bf-f3f8-4c37-917c-273b1704b133
+RAILWAY_PROJECT=your-railway-project-id
+RAILWAY_ENVIRONMENT=your-railway-environment-id
+RAILWAY_SERVICE=your-railway-service-id
 COMMAND_TIMEOUT=45
 SERVER_NAME=Ideology Prizmarine
-SERVER_IP=example.com
+SERVER_IP=example.playit.gg
 SERVER_PORT=19132
 ENABLE_MONITORING=false
 MONITOR_INTERVAL=60000
@@ -222,4 +222,4 @@ NOTIFICATION_GROUP_JID=120363xxxx@g.us
 - Railway is executed with `child_process.spawn`, not shell `exec`.
 - User input is never concatenated into a local shell command.
 - Only whitelisted `/home/mc/scripts/*.sh` commands can run.
-- Do not commit `.env`, `auth/`, or WhatsApp session files.
+- Do not commit `.env` or WhatsApp auth session files.
