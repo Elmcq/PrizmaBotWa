@@ -2,11 +2,12 @@ const { formatCompactUptime, formatWibDateTime } = require('../utils/time');
 
 module.exports = {
   name: 'uptime',
-  prefix: '!',
+  prefixes: ['/', '!'],
+  allowAnyGroup: true,
   description: 'Tampilkan uptime bot.',
-  async execute(message, { startedAt }) {
-    await message.reply(
-      '🕒 Bot Uptime\n\n' +
+  async execute({ startedAt, reply }) {
+    await reply(
+      'Bot Uptime\n\n' +
         `Uptime: ${formatCompactUptime(process.uptime())}\n` +
         `Started: ${formatWibDateTime(startedAt)}\n` +
         `Current: ${formatWibDateTime()}`

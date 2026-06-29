@@ -1,11 +1,11 @@
 const { formatCommandOutput, runRailwayCommand } = require('../utils/railwaySsh');
 
 module.exports = {
-  name: 'status',
+  name: 'start',
   ownerOnly: true,
-  description: 'Cek status server Minecraft.',
+  description: 'Start Minecraft server via Railway.',
   async execute({ reply }) {
-    const result = await runRailwayCommand('status');
+    const result = await runRailwayCommand('start');
     await reply(formatCommandOutput(result.stdout, result.stderr) || 'No output.');
   }
 };

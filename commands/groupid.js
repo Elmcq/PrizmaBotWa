@@ -1,27 +1,20 @@
-const { getGroupChat, isGroupAdmin } = require('../utils/permissions');
-
 module.exports = {
   name: 'groupid',
-  prefix: '!',
-  description: 'Tampilkan informasi grup.',
-  async execute(message, { config } = {}) {
-    const chat = await getGroupChat(message);
-
-    if (!chat) {
-      await message.reply('This command can only be used in a group.');
-      return;
-    }
-
-    if (!isGroupAdmin(message, chat, config)) {
-      await message.reply('You do not have permission to use this command.');
-      return;
-    }
-
-    await message.reply(
-      '📋 Group Information\n\n' +
-        `Name: ${chat.name}\n` +
-        `Group ID: ${chat.id._serialized}\n` +
-        `Members: ${chat.participants.length}`
-    );
+  prefixes: ['/', '!'],
+  ownerOnly: true,
+  allowAnyGroup: true,
+  description: 'Tampilkan Chat JID, Sender JID, dan mention.',
+  async execute({ from, sender, isGroup, mentionedJids, reply }) {
+    await reply(formatJidReply(from, sender, isGroup, mentionedJids));
   }
 };
+
+function formatJidReply(from, sender, isGroup, mentionedJids) {
+  return [
+    `Chat JID: ${from || '-'}`,
+    `Sender JID: ${sender || '-'}`,
+    `Is group: ${Boolean(isGroup)}`,
+    'Mentioned:',
+    mentionedJids.length > 0 ? mentionedJids.join('\n') : '-'
+  ].join('\n');
+}

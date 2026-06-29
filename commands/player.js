@@ -3,24 +3,19 @@ const { isServerConfigReady } = require('../utils/serverConfig');
 
 module.exports = {
   name: 'player',
+  allowAnyGroup: true,
   description: 'Tampilkan jumlah player online.',
-  async execute(message, { config }) {
+  async execute({ config, reply }) {
     if (!isServerConfigReady(config.server)) {
-      await message.reply('IP server belum diset di config.js');
+      await reply('SERVER_IP atau SERVER_PORT belum valid di .env.');
       return;
     }
 
     try {
       const status = await getBedrockStatus(config, '/player');
-
-      await message.reply(
-        `Player online di ${config.server.name}: ` +
-          `${status.players.online}/${status.players.max}`
-      );
+      await reply(`Player online di ${config.server.name}: ${status.players.online}/${status.players.max}`);
     } catch (error) {
-      await message.reply(
-        `Belum bisa cek player ${config.server.name}. Server offline atau tidak bisa dihubungi.`
-      );
+      await reply(`Belum bisa cek player ${config.server.name}. Server offline atau tidak bisa dihubungi.`);
     }
   }
 };

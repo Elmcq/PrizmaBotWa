@@ -2,12 +2,13 @@ const { formatUptime } = require('../utils/time');
 
 module.exports = {
   name: 'ping',
+  allowAnyGroup: true,
   description: 'Cek bot masih hidup.',
-  async execute(message, { receivedAt }) {
+  async execute({ receivedAt, reply }) {
     const latency = Date.now() - receivedAt;
 
-    await message.reply(
-      '🏓 Pong!\n' +
+    await reply(
+      'Pong!\n' +
         'Bot Status : Online\n' +
         `Uptime : ${formatUptime(process.uptime())}\n` +
         `Latency : ${latency} ms`

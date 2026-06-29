@@ -1,27 +1,26 @@
-async function getGroupChat(message) {
-  const chat = await message.getChat();
+const { getMessageSender, isOwner } = require('./commandAccess');
+const { normalizeJid } = require('./jids');
 
-  return chat.isGroup ? chat : null;
+async function getGroupChat() {
+  return null;
 }
 
 function isOwnerNumber(message, config = {}) {
-  const senderId = message.author || message.from;
-  const ownerNumbers = Array.isArray(config.ownerNumbers) ? config.ownerNumbers : [];
-
-  return ownerNumbers.includes(senderId);
+  return isOwner(message, config);
 }
 
 function isGroupAdmin(message, chat, config = {}) {
-  if (isOwnerNumber(message, config)) {
+  if (isOwner(message, config)) {
     return true;
   }
 
-  const senderId = message.author || message.from;
-  const participant = chat.participants.find((member) => {
-    return member.id && member.id._serialized === senderId;
-  });
+  const sender = normalizeJid(getMessageSender(message));
+  const participants = Array.isArray(chat?.participants) ? chat.participants : [];
 
-  return Boolean(participant && (participant.isAdmin || participant.isSuperAdmin));
+  return participants.some((member) => {
+    const id = normalizeJid(member.id?._serialized || member.id || member.jid);
+    return id === sender && (member.isAdmin || member.isSuperAdmin || member.admin);
+  });
 }
 
 module.exports = {

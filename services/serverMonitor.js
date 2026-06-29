@@ -8,18 +8,24 @@ const STATUS = {
 };
 
 class ServerMonitor {
-  constructor(client, config) {
-    this.client = client;
+  constructor(sock, config) {
+    this.sock = sock;
     this.config = config;
     this.timer = null;
+    this.lastErrorLogAt = 0;
     this.lastStatus = null;
-    this.isRunning = false;
     this.isChecking = false;
+    this.isRunning = false;
   }
 
   start() {
-    if (!this.config.enableMonitoring) {
-      console.log(`[${formatClock()}] Monitoring server nonaktif dari config.js`);
+    if (!this.config.monitoring.enabled) {
+      console.log(`[${formatClock()}] Monitoring disabled by ENABLE_MONITORING=false`);
+      return;
+    }
+
+    if (!isServerConfigReady(this.config.server)) {
+      console.warn(`[${formatClock()}] Monitoring enabled, but SERVER_IP/SERVER_PORT is not valid.`);
       return;
     }
 
@@ -28,20 +34,20 @@ class ServerMonitor {
     }
 
     this.isRunning = true;
-    console.log(`[${formatClock()}] Monitoring server dimulai (${this.getInterval()} ms)`);
+    console.log(`[${formatClock()}] Monitoring started (${this.config.monitoring.interval} ms)`);
 
     this.check();
-    this.timer = setInterval(() => this.check(), this.getInterval());
+    this.timer = setInterval(() => this.check(), this.config.monitoring.interval);
   }
 
-  stop(reason = 'monitoring dihentikan') {
+  stop(reason = 'monitoring stopped') {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
 
     if (this.isRunning) {
-      console.log(`[${formatClock()}] Monitoring server berhenti: ${reason}`);
+      console.log(`[${formatClock()}] Monitoring stopped: ${reason}`);
     }
 
     this.isRunning = false;
@@ -49,12 +55,6 @@ class ServerMonitor {
 
   async check() {
     if (this.isChecking) {
-      console.log(`[${formatClock()}] Monitoring dilewati, pengecekan sebelumnya belum selesai`);
-      return;
-    }
-
-    if (!isServerConfigReady(this.config.server)) {
-      console.log(`[${formatClock()}] Monitoring aktif, IP server belum diset di config.js`);
       return;
     }
 
@@ -64,7 +64,7 @@ class ServerMonitor {
       const result = await this.getServerStatus();
       await this.handleStatusResult(result);
     } catch (error) {
-      console.error(`[${formatClock()}] Monitoring error:`, error.message);
+      this.throttledWarn(`Monitoring check failed: ${error.message}`);
     } finally {
       this.isChecking = false;
     }
@@ -73,26 +73,17 @@ class ServerMonitor {
   async getServerStatus() {
     try {
       const data = await getBedrockStatus(this.config, 'monitoring');
-
-      return {
-        status: STATUS.ONLINE,
-        data
-      };
+      return { status: STATUS.ONLINE, data };
     } catch (error) {
-      return {
-        status: STATUS.OFFLINE,
-        data: null
-      };
+      this.throttledWarn(`Minecraft status unavailable: ${error.message}`);
+      return { status: STATUS.OFFLINE, data: null };
     }
   }
 
   async handleStatusResult(result) {
     const changed = this.lastStatus !== null && this.lastStatus !== result.status;
-    const same = this.lastStatus === result.status;
 
-    if (same) {
-      console.log(`[${formatClock()}] Server ${result.status} (tidak berubah)`);
-    } else {
+    if (changed || this.lastStatus === null) {
       console.log(`[${formatClock()}] Server ${result.status}`);
     }
 
@@ -104,18 +95,17 @@ class ServerMonitor {
   }
 
   async sendNotification(result) {
-    const groupId = this.config.notificationGroupId.trim();
+    const groupJid = this.config.monitoring.notificationGroupJid;
 
-    if (!groupId) {
-      console.log(`[${formatClock()}] Status berubah, tapi notificationGroupId kosong`);
+    if (!groupJid) {
       return;
     }
 
     try {
-      await this.client.sendMessage(groupId, this.buildNotificationMessage(result));
-      console.log(`[${formatClock()}] Notifikasi server dikirim ke ${groupId}`);
+      await this.sock.sendMessage(groupJid, { text: this.buildNotificationMessage(result) });
+      console.log(`[${formatClock()}] Server status notification sent to ${groupJid}`);
     } catch (error) {
-      console.error(`[${formatClock()}] Gagal mengirim notifikasi server:`, error.message);
+      this.throttledWarn(`Failed to send monitoring notification: ${error.message}`);
     }
   }
 
@@ -125,32 +115,31 @@ class ServerMonitor {
       const version = result.data.version || {};
 
       return (
-        `🟢 ${this.config.server.name} Server\n\n` +
+        `${this.config.server.name} Server\n\n` +
         'Server kembali ONLINE!\n\n' +
         `IP: ${this.config.server.ip}:${this.config.server.port}\n\n` +
         `Player: ${players.online}/${players.max}\n\n` +
         `Version: ${version.name || '-'}\n\n` +
-        'Jam:\n' +
-        formatClock()
+        `Jam: ${formatClock()}`
       );
     }
 
     return (
-      `🔴 ${this.config.server.name} Server\n\n` +
+      `${this.config.server.name} Server\n\n` +
       'Server OFFLINE atau tidak dapat dihubungi.\n\n' +
-      'Jam:\n' +
-      formatClock()
+      `Jam: ${formatClock()}`
     );
   }
 
-  getInterval() {
-    const interval = Number(this.config.monitorInterval);
+  throttledWarn(message) {
+    const now = Date.now();
 
-    if (!Number.isInteger(interval) || interval < 10000) {
-      return 60000;
+    if (now - this.lastErrorLogAt < 5 * 60 * 1000) {
+      return;
     }
 
-    return interval;
+    this.lastErrorLogAt = now;
+    console.warn(`[${formatClock()}] ${message}`);
   }
 }
 

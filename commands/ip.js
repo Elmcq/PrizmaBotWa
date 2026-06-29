@@ -1,10 +1,11 @@
 module.exports = {
   name: 'ip',
+  allowAnyGroup: true,
   description: 'Tampilkan IP server Minecraft.',
-  async execute(message, { config }) {
+  async execute({ config, reply }) {
     const { name, ip, port } = config.server;
 
-    await message.reply(
+    await reply(
       `Server: ${name}\n` +
         `IP: ${ip}\n` +
         `Port: ${port}\n\n` +

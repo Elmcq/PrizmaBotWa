@@ -22,17 +22,23 @@ async function getBedrockStatus(config, source = 'minecraft') {
     response.statusSource = 'udp';
     return response;
   } catch (udpError) {
-    console.warn(`[${formatClock()}] ${source} UDP status failed, trying mcstatus.io: ${udpError.message}`);
+    if (source !== 'monitoring') {
+      console.warn(`[${formatClock()}] ${source} UDP status failed, trying mcstatus.io: ${udpError.message}`);
+    }
 
     try {
       const response = await getBedrockStatusFromMcstatus(config, source);
       response.statusSource = 'mcstatus.io';
       response.udpError = udpError;
-      console.log(`[${formatClock()}] ${source} Minecraft status OK via mcstatus.io fallback`);
+      if (source !== 'monitoring') {
+        console.log(`[${formatClock()}] ${source} Minecraft status OK via mcstatus.io fallback`);
+      }
       return response;
     } catch (httpError) {
       httpError.cause = udpError;
-      console.error(`[${formatClock()}] ${source} mcstatus.io status failed: ${httpError.message}`);
+      if (source !== 'monitoring') {
+        console.warn(`[${formatClock()}] ${source} mcstatus.io status failed: ${httpError.message}`);
+      }
       throw httpError;
     }
   }
